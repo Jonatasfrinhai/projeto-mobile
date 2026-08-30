@@ -51,7 +51,7 @@ export default function ColecaoWeb() {
           </View>
         ))}
       </View>
-      {busca && colecaoFiltrada.length === 0 && (
+      {busca !== '' && colecaoFiltrada.length === 0 && (
         <Text style={styles.vazio}>Nenhum jogador da sua coleção bate com a busca.</Text>
       )}
 
@@ -66,7 +66,7 @@ export default function ColecaoWeb() {
           </View>
         ))}
       </View>
-      {busca && faltantesFiltrados.length === 0 && (
+      {busca !== '' && faltantesFiltrados.length === 0 && (
         <Text style={styles.vazio}>Nenhum jogador disponível bate com a busca.</Text>
       )}
     </View>

@@ -65,7 +65,7 @@ export default function Colecao() {
                 <CartaJogador jogador={jogador} />
               </View>
             ))}
-            {busca && colecaoFiltrada.length === 0 && (
+            {busca !== '' && colecaoFiltrada.length === 0 && (
               <Text style={styles.vazio}>Nenhum jogador da sua coleção bate com a busca.</Text>
             )}
             <Text style={[styles.tituloSecao, { marginTop: 20 }]}>

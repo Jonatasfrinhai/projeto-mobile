@@ -1,5 +1,6 @@
 import { Slot, usePathname, router } from 'expo-router';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Header } from '../../src/components/Header';
 
 const ITENS = [
   { href: '/(tabs)/colecao', label: 'Coleção' },
@@ -16,7 +17,7 @@ export default function TabsLayoutWeb() {
   return (
     <View style={styles.container}>
       <View style={styles.navbar}>
-        <Text style={styles.logo}>⚽ Futebol Cards</Text>
+        <Header />
         <View style={styles.links}>
           {ITENS.map((item) => {
             const ativo = pathname.startsWith(item.href.replace('/(tabs)', ''));
