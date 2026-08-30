@@ -121,3 +121,4 @@ const styles = StyleSheet.create({
   atributos: { flexDirection: 'row', gap: 12 },
   atributo: { fontSize: 13 },
 });
+export default CartaJogador;
