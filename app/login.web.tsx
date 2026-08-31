@@ -82,16 +82,37 @@ function CarrosselLado() {
 export default function LoginWeb() {
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
-  const [perfil, setPerfil] = useState<'treinador' | 'olheiro'>('treinador');
+  const [email, setEmail] = useState('');
+  const [cep, setCep] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const { entrar } = useAuth();
+  const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false);
+  const { entrar, cadastrar } = useAuth();
 
   async function handleAcao() {
-    if (!nome.trim()) return;
-    // Como a AuthContext atual armazena o nome sem servidor, chamamos apenas o entrar.
-    // Em um backend real, a senha seria validada aqui.
-    await entrar(nome);
-    router.replace('/(tabs)/colecao');
+    if (!nome.trim() || !senha) {
+      setErro('Preencha usuário e senha.');
+      return;
+    }
+    if (!isLogin && (!email.trim() || !cep.trim())) {
+      setErro('Preencha e-mail e CEP para se cadastrar.');
+      return;
+    }
+
+    setErro('');
+    setCarregando(true);
+    try {
+      if (isLogin) {
+        await entrar(nome, senha);
+      } else {
+        await cadastrar(nome, senha, email, cep);
+      }
+      router.replace('/(tabs)/colecao');
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Erro ao entrar. Tente novamente.');
+    } finally {
+      setCarregando(false);
+    }
   }
 
   return (
@@ -133,33 +154,41 @@ export default function LoginWeb() {
           </View>
 
           {!isLogin && (
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Perfil</Text>
-              <View style={styles.selectorRow}>
-                <Pressable
-                  style={[styles.selectorOption, perfil === 'treinador' && styles.selectorAtivo]}
-                  onPress={() => setPerfil('treinador')}
-                >
-                  <Text style={[styles.selectorTexto, perfil === 'treinador' && styles.selectorTextoAtivo]}>
-                    Treinador
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.selectorOption, perfil === 'olheiro' && styles.selectorAtivo]}
-                  onPress={() => setPerfil('olheiro')}
-                >
-                  <Text style={[styles.selectorTexto, perfil === 'olheiro' && styles.selectorTextoAtivo]}>
-                    Olheiro
-                  </Text>
-                </Pressable>
+            <>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>E-mail</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite seu e-mail"
+                  placeholderTextColor="#bbb"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
               </View>
-            </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>CEP</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite seu CEP"
+                  placeholderTextColor="#bbb"
+                  value={cep}
+                  onChangeText={setCep}
+                  keyboardType="numeric"
+                />
+              </View>
+            </>
           )}
+
+          {!!erro && <Text style={styles.erroTexto}>{erro}</Text>}
 
           <View style={{ height: 8 }} />
 
-          <Pressable style={styles.botao} onPress={handleAcao}>
-            <Text style={styles.botaoTexto}>{isLogin ? 'Entrar' : 'Cadastrar'}</Text>
+          <Pressable style={styles.botao} onPress={handleAcao} disabled={carregando}>
+            <Text style={styles.botaoTexto}>
+              {carregando ? 'Aguarde...' : isLogin ? 'Entrar' : 'Cadastrar'}
+            </Text>
           </Pressable>
 
           <View style={styles.divider}>
@@ -360,31 +389,12 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#333',
   },
-  selectorRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  selectorOption: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#e8e8e8',
-    borderRadius: 10,
-    paddingVertical: 13,
-    alignItems: 'center',
-  },
-  selectorAtivo: {
-    backgroundColor: VERDE,
-    borderColor: VERDE,
-  },
-  selectorTexto: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#888',
-  },
-  selectorTextoAtivo: {
-    color: '#fff',
+  erroTexto: {
+    color: '#c0392b',
+    fontSize: 13,
     fontWeight: '500',
+    marginTop: 4,
+    marginBottom: 4,
   },
   botao: { 
     backgroundColor: VERDE, 
